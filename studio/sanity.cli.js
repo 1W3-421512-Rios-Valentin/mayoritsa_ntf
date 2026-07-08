@@ -1,8 +1,9 @@
-import { defineCliConfig } from 'sanity/cli';
-
-export default defineCliConfig({
+// Config del CLI de Sanity. Se exporta un objeto plano (sin `defineCliConfig`)
+// para evitar problemas de resolución del import en algunas versiones del CLI.
+// projectId/dataset son públicos (no secretos).
+export default {
   api: {
-    projectId: process.env.SANITY_STUDIO_PROJECT_ID,
-    dataset: process.env.SANITY_STUDIO_DATASET || 'production',
+    projectId: '1uuj4tpg',
+    dataset: 'production',
   },
-});
+};

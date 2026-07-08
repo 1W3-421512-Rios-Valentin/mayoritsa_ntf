@@ -6,8 +6,8 @@ export default defineConfig({
   name: 'default',
   title: 'Catálogo Mayorista NTF',
 
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID,
-  dataset: process.env.SANITY_STUDIO_DATASET || 'production',
+  projectId: '1uuj4tpg',
+  dataset: 'production',
 
   plugins: [structureTool()],
 

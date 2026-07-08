@@ -2,7 +2,6 @@
   "name": "catalogo-mayorista-ntf-studio",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "sanity dev",
     "start": "sanity dev",
