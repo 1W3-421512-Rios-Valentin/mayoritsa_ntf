@@ -1,0 +1,19 @@
+{
+  "name": "catalogo-mayorista-ntf",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.21.0",
+    "@sanity/image-url": "^1.1.0",
+    "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
