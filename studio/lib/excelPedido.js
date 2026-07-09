@@ -1,23 +1,25 @@
-// Export Excel: rellena la plantilla mayorista real (§10) con ExcelJS.
+// Genera el .xlsx del pedido rellenando la plantilla mayorista (§10 CLAUDE.md).
+// Port browser de src/export/excel.js del front. Devuelve un Blob.
 import ExcelJS from 'exceljs';
-import plantillaUrl from '../../assets/Plantilla_Pedidos_mayoristas_ntf.xlsx?url';
-import { SIZE_TO_COL } from '../lib/sizes.js';
+import { SIZE_TO_COL } from './sizes.js';
+
+const PLANTILLA_URL = '/static/Plantilla_Pedidos_mayoristas_ntf.xlsx';
 
 // pedido: { cliente, fecha (dd/mm/aaaa), items: [{ sku, descripcion, precio,
 //           cantidades: { [talle]: qty } }] }
-export async function exportExcel({ cliente, fecha, items }) {
-  if (!items.length) return;
+export async function buildExcelPedido({ cliente, fecha, items }) {
+  const res = await fetch(PLANTILLA_URL);
+  if (!res.ok) throw new Error(`No se pudo cargar la plantilla (${res.status})`);
+  const buf = await res.arrayBuffer();
 
-  const buf = await fetch(plantillaUrl).then((r) => r.arrayBuffer());
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buf);
   const ws = wb.worksheets[0];
 
-  // Cabecera: valor concatenado en la misma celda combinada (F0).
+  // Cabecera: valor concatenado en la misma celda combinada (verificado en F0).
   ws.getCell('A1').value = `Cliente: ${cliente || ''}`.trimEnd();
   ws.getCell('N1').value = `Fecha: ${fecha}`;
 
-  // Datos desde la fila 3.
   let r = 3;
   for (const it of items) {
     ws.getCell(`A${r}`).value = it.sku;
@@ -33,20 +35,25 @@ export async function exportExcel({ cliente, fecha, items }) {
     r++;
   }
 
-  // Fila final TOTAL.
   const ultima = r - 1;
   ws.getCell(`N${r}`).value = 'TOTAL';
   ws.getCell(`O${r}`).value = { formula: `SUM(O3:O${ultima})` };
 
   const out = await wb.xlsx.writeBuffer();
-  const blob = new Blob([out], {
+  return new Blob([out], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
+}
+
+export function nombreArchivoPedido(cliente, fecha) {
   const nombre = (cliente || 'sin-cliente').replace(/[^\w\-]+/g, '_');
-  const fechaArch = fecha.replace(/\//g, '-');
+  return `Pedido_${nombre}_${(fecha || '').replace(/\//g, '-')}.xlsx`;
+}
+
+export function descargarBlob(blob, filename) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `Pedido_${nombre}_${fechaArch}.xlsx`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(a.href);
 }

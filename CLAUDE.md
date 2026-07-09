@@ -19,8 +19,12 @@ Debe ser fácil de usar, clara, y verse bien en **móvil y PC**.
 
 - No hay backend propio ni lógica pesada: eso ya lo resuelve otro sistema
   interno. Esta app es liviana y solo lee catálogo y genera exports.
-- No persiste pedidos (el pedido se exporta, no se guarda).
 - No maneja stock, facturación ni cuentas de cliente.
+
+> **Actualización:** los pedidos ahora SÍ se persisten como documentos
+> `pedido` en el dataset **privado** `interno` (ver §6 bis). Se arman desde el
+> Studio (workspace "Interno"), no desde el front público, que quedó solo
+> catálogo + export PDF.
 
 ## 3. Stack y restricciones
 
@@ -105,6 +109,24 @@ GROQ de catálogo:
 }
 ```
 
+## 6 bis. Datos internos (dataset privado `interno`)
+
+Dataset `interno` (`aclMode: private`, mismo proyecto Sanity): pedidos y
+clientes. Solo lectura/escritura autenticada (Studio). El front público NO
+accede a estos datos.
+
+- **`cliente`**: nombre (req), localidad, provincia, direccion, telefono,
+  email, `ubicacion` (geopoint, input custom Leaflet), notas, activo.
+- **`pedido`**: `cliente` (reference), `fecha` (date), `items[]` (SNAPSHOT:
+  sku, descripcion, categoria, precio, cantidades[{talle, cantidad}],
+  unidades, subtotal), `totalUnidades`, `totalMonto`, `archivo` (file .xlsx),
+  `hojaOrigen` (para importados del historial), notas.
+- El Studio tiene **dos workspaces**: "Catálogo" (production) e "Interno"
+  (interno), con structure "Pedidos por cliente" (carpeta por cliente).
+- Tools del workspace Interno: **Armar pedido** (guarda + exporta Excel),
+  **Dashboard** (Resumen/Alertas/Mapa) e **Importar historial** (carpetas
+  ex-SharePoint: cada hoja de cada .xlsx = un pedido).
+
 ## 7. Vistas
 
 ### 7.1 Catálogo (público)
@@ -114,13 +136,16 @@ GROQ de catálogo:
 - Buscador por SKU / descripción / categoría + filtro por categoría.
 - Estados: cargando, vacío, error de red.
 
-### 7.2 Armar pedido
-- Campos de cabecera: **Cliente** (texto) y **Fecha** (default hoy).
-- Listado de artículos con inputs de cantidad por talle disponible.
-- Totales en vivo: unidades por artículo, subtotal ($) por artículo y total
-  general.
-- Botones: **Exportar Excel** (§10) y limpiar pedido.
-- Solo entran a la exportación los artículos con al menos una cantidad > 0.
+### 7.2 Armar pedido (Studio, workspace Interno)
+- Vive en el **Sanity Studio** (tool "Armar pedido"), no en el front público:
+  el que arma el pedido está autenticado y el pedido se **guarda** (§6 bis).
+- Cabecera: **Cliente** (autocompletado sobre documentos `cliente` + alta
+  inline) y **Fecha** (default hoy).
+- Listado de artículos (lee `production`) con inputs de cantidad por talle,
+  totales en vivo por artículo y total general.
+- Botón único **Guardar pedido y descargar Excel**: genera el .xlsx (§10),
+  lo sube como asset, crea el documento `pedido` y lo descarga local.
+- Solo entran los artículos con al menos una cantidad > 0.
 
 ### 7.3 Admin / CRUD
 - Es **Sanity Studio** (proyecto aparte, `sanity deploy` → `*.sanity.studio`).
@@ -193,6 +218,9 @@ GROQ de catálogo:
 - Front **solo lectura**; sin tokens de Sanity en el bundle.
 - Escrituras (alta/edición de productos) exclusivamente por Studio autenticado.
 - No exponer datos sensibles del negocio más allá del catálogo mayorista.
+- **Pedidos y clientes en dataset privado `interno`** (lectura solo
+  autenticada): las ventas no son consultables por la API pública aunque se
+  conozca el projectId. Nunca mover estos tipos a `production`.
 
 ## 15. Estructura del repo (sugerida)
 

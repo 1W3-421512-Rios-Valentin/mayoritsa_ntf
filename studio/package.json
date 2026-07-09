@@ -9,9 +9,12 @@
     "deploy": "sanity deploy"
   },
   "dependencies": {
-    "sanity": "^3.57.0",
+    "exceljs": "^4.4.0",
+    "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
+    "sanity": "^3.57.0",
     "styled-components": "^6.1.12"
   }
 }

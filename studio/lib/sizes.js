@@ -7,6 +7,26 @@ export const NUMERO = ['34', '36', '38', '40', '42', '44', '46', '48', '50', '52
 export const LETRA = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'TU'];
 const LETRA_NO_TU = LETRA.filter((t) => t !== 'TU');
 
+// Mapeo talle → columna del Excel (mismas 10 columnas D–M que src/lib/sizes.js).
+export const SIZE_TO_COL = {
+  '34': 'D', '36': 'E', '38': 'F', '40': 'G', '42': 'H',
+  '44': 'I', '46': 'J', '48': 'K', '50': 'L', '52': 'M',
+  'XXXS': 'D', 'XXS': 'E', 'XS': 'F', 'S': 'G', 'M': 'H',
+  'L': 'I', 'XL': 'J', 'XXL': 'K', 'XXXL': 'L',
+  'TU': 'M',
+};
+
+// Columna → talle según escala (para leer la plantilla al importar historial).
+export const COL_TO_NUMERO = { D: '34', E: '36', F: '38', G: '40', H: '42', I: '44', J: '46', K: '48', L: '50', M: '52' };
+export const COL_TO_LETRA = { D: 'XXXS', E: 'XXS', F: 'XS', G: 'S', H: 'M', I: 'L', J: 'XL', K: 'XXL', L: 'XXXL', M: 'TU' };
+
+// Escalas por tipoTalle (para la UI de cantidades del pedido).
+export const SCALES = {
+  numero: NUMERO,
+  letra: LETRA,
+  unico: ['TU'],
+};
+
 // Normaliza un talle de la planilla al vocabulario del sistema.
 export function normalizeTalle(t) {
   t = (t || '').trim().toUpperCase();
