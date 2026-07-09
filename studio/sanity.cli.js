@@ -6,4 +6,7 @@ export default {
     projectId: '1uuj4tpg',
     dataset: 'production',
   },
+  // Hostname del Studio deployado → https://mayoritsa-ntf.sanity.studio
+  // Fijarlo evita el prompt interactivo en `sanity deploy`.
+  studioHost: 'mayoritsa-ntf',
 };
