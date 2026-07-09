@@ -1,8 +1,9 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { UploadIcon } from '@sanity/icons';
+import { UploadIcon, ImagesIcon } from '@sanity/icons';
 import { schemaTypes } from './schemas/index.js';
 import BulkImport from './tools/BulkImport.jsx';
+import BulkPhotos from './tools/BulkPhotos.jsx';
 
 export default defineConfig({
   name: 'default',
@@ -20,6 +21,12 @@ export default defineConfig({
       title: 'Carga masiva',
       icon: UploadIcon,
       component: BulkImport,
+    },
+    {
+      name: 'fotos-masivas',
+      title: 'Fotos masivas',
+      icon: ImagesIcon,
+      component: BulkPhotos,
     },
   ],
 
