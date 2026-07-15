@@ -17,6 +17,9 @@ export default function ResetDatos() {
   const [borrando, setBorrando] = useState(false);
   const [paso, setPaso] = useState('');
   const [result, setResult] = useState(null);
+  const [huerfanos, setHuerfanos] = useState(null);
+  const [limpiando, setLimpiando] = useState(false);
+  const [resultAssets, setResultAssets] = useState(null);
 
   const cargarConteo = useCallback(() => {
     client.fetch(`{
@@ -24,8 +27,29 @@ export default function ResetDatos() {
       "pedidos": count(*[_type=="pedido"]),
       "devoluciones": count(*[_type=="devolucion"])
     }`).then(setConteo).catch(() => setConteo({ clientes: 0, pedidos: 0, devoluciones: 0 }));
+    client.fetch('count(*[_type=="sanity.fileAsset" && count(*[references(^._id)])==0])')
+      .then(setHuerfanos).catch(() => setHuerfanos(0));
   }, [client]);
   useEffect(() => { cargarConteo(); }, [cargarConteo]);
+
+  async function limpiarAssets() {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(`¿Borrar ${huerfanos} archivo(s) Excel huérfano(s)? (solo los que no están en uso)`)) return;
+    setLimpiando(true);
+    setResultAssets(null);
+    try {
+      const r = await client.delete({ query: '*[_type == "sanity.fileAsset" && count(*[references(^._id)])==0]' });
+      const n = r?.results?.length ?? r?.documentIds?.length ?? 0;
+      setResultAssets(n);
+      toast.push({ status: 'success', title: `Borrados ${n} archivo(s)` });
+      cargarConteo();
+    } catch (err) {
+      console.error(err);
+      toast.push({ status: 'error', title: 'Error al limpiar archivos', description: String(err.message || err) });
+    } finally {
+      setLimpiando(false);
+    }
+  }
 
   async function borrarTodo() {
     if (texto.trim().toUpperCase() !== PALABRA) return;
@@ -117,6 +141,33 @@ export default function ResetDatos() {
             </Text>
           </Card>
         )}
+
+        {/* Limpieza de archivos Excel huérfanos */}
+        <Card padding={4} radius={3} shadow={1} tone="caution">
+          <Stack space={3}>
+            <Text size={1} weight="semibold">Limpiar archivos Excel huérfanos</Text>
+            <Text size={1} muted>
+              Borra los .xlsx que quedaron sueltos (sin pedido que los use), por ejemplo
+              después de un reset. No toca archivos en uso.
+            </Text>
+            {huerfanos == null ? (
+              <Flex align="center" gap={2}><Spinner muted /><Text size={1} muted>Contando…</Text></Flex>
+            ) : (
+              <Text size={1}>Archivos huérfanos: <b>{huerfanos}</b></Text>
+            )}
+            <Flex justify="flex-end">
+              <Button
+                tone="critical"
+                text={limpiando ? 'Limpiando…' : 'Limpiar archivos'}
+                disabled={limpiando || !huerfanos}
+                onClick={limpiarAssets}
+              />
+            </Flex>
+            {resultAssets != null && (
+              <Text size={1} muted>✓ Borrados {resultAssets} archivo(s).</Text>
+            )}
+          </Stack>
+        </Card>
 
         {vacio && !result && (
           <Text size={1} muted>No hay datos para borrar.</Text>
