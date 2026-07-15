@@ -35,6 +35,28 @@ export function topDevueltos(devoluciones, n = 10) {
   return topArticulos(devoluciones, n);
 }
 
+// Análisis COMPLETO por producto: vendidas/monto, devueltas/monto y neto.
+export function analisisProductos(pedidos, devoluciones = []) {
+  const map = new Map();
+  const get = (it) => {
+    const k = it.sku || '(sin sku)';
+    if (!map.has(k)) {
+      map.set(k, { sku: k, descripcion: it.descripcion || '', categoria: it.categoria || '', vendidas: 0, montoVendido: 0, devueltas: 0, montoDevuelto: 0 });
+    }
+    const e = map.get(k);
+    if (!e.descripcion && it.descripcion) e.descripcion = it.descripcion;
+    if (!e.categoria && it.categoria) e.categoria = it.categoria;
+    return e;
+  };
+  for (const p of pedidos) for (const it of p.items || []) { const e = get(it); e.vendidas += it.unidades || 0; e.montoVendido += it.subtotal || 0; }
+  for (const d of devoluciones) for (const it of d.items || []) { const e = get(it); e.devueltas += it.unidades || 0; e.montoDevuelto += it.subtotal || 0; }
+  return [...map.values()].map((e) => ({
+    ...e,
+    netoUnidades: e.vendidas - e.devueltas,
+    netoMonto: e.montoVendido - e.montoDevuelto,
+  }));
+}
+
 export function ventasPorCategoria(pedidos) {
   const map = new Map();
   for (const p of pedidos) {

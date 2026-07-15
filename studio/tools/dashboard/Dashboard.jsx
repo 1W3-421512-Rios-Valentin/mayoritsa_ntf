@@ -5,6 +5,7 @@ import {
 } from '@sanity/ui';
 import { useClient } from 'sanity';
 import Resumen from './Resumen.jsx';
+import Productos from './Productos.jsx';
 import Alertas from './Alertas.jsx';
 import Mapa from './Mapa.jsx';
 
@@ -48,6 +49,8 @@ export default function Dashboard() {
             <TabList space={2}>
               <Tab id="tab-resumen" aria-controls="panel-resumen" label="Resumen"
                 selected={tab === 'resumen'} onClick={() => setTab('resumen')} />
+              <Tab id="tab-productos" aria-controls="panel-productos" label="Productos"
+                selected={tab === 'productos'} onClick={() => setTab('productos')} />
               <Tab id="tab-alertas" aria-controls="panel-alertas" label="Alertas"
                 selected={tab === 'alertas'} onClick={() => setTab('alertas')} />
               <Tab id="tab-mapa" aria-controls="panel-mapa" label="Mapa"
@@ -56,6 +59,9 @@ export default function Dashboard() {
 
             <TabPanel id="panel-resumen" aria-labelledby="tab-resumen" hidden={tab !== 'resumen'}>
               <Resumen pedidos={pedidos} clientes={clientes} devoluciones={devoluciones} />
+            </TabPanel>
+            <TabPanel id="panel-productos" aria-labelledby="tab-productos" hidden={tab !== 'productos'}>
+              <Productos pedidos={pedidos} clientes={clientes} devoluciones={devoluciones} />
             </TabPanel>
             <TabPanel id="panel-alertas" aria-labelledby="tab-alertas" hidden={tab !== 'alertas'}>
               <Alertas pedidos={pedidos} clientes={clientes} />
