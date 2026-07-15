@@ -11,6 +11,7 @@ import Mapa from './Mapa.jsx';
 export default function Dashboard() {
   const client = useClient({ apiVersion: '2024-01-01' });
   const [pedidos, setPedidos] = useState(null);
+  const [devoluciones, setDevoluciones] = useState(null);
   const [clientes, setClientes] = useState(null);
   const [tab, setTab] = useState('resumen');
 
@@ -20,12 +21,17 @@ export default function Dashboard() {
       items[]{sku, descripcion, categoria, unidades, subtotal},
       cliente->{_id, nombre, ubicacion, localidad, provincia}
     }`).then(setPedidos).catch(() => setPedidos([]));
+    client.fetch(`*[_type=="devolucion"]{
+      _id, fecha, totalUnidades, totalMonto,
+      items[]{sku, descripcion, categoria, unidades, subtotal},
+      cliente->{_id, nombre}
+    }`).then(setDevoluciones).catch(() => setDevoluciones([]));
     client.fetch('*[_type=="cliente"] | order(nombre asc){_id, nombre, localidad, provincia, ubicacion}')
       .then(setClientes).catch(() => setClientes([]));
   }, [client]);
   useEffect(() => { cargar(); }, [cargar]);
 
-  const cargando = pedidos == null || clientes == null;
+  const cargando = pedidos == null || clientes == null || devoluciones == null;
 
   return (
     <Container width={5} padding={4}>
@@ -49,7 +55,7 @@ export default function Dashboard() {
             </TabList>
 
             <TabPanel id="panel-resumen" aria-labelledby="tab-resumen" hidden={tab !== 'resumen'}>
-              <Resumen pedidos={pedidos} clientes={clientes} />
+              <Resumen pedidos={pedidos} clientes={clientes} devoluciones={devoluciones} />
             </TabPanel>
             <TabPanel id="panel-alertas" aria-labelledby="tab-alertas" hidden={tab !== 'alertas'}>
               <Alertas pedidos={pedidos} clientes={clientes} />

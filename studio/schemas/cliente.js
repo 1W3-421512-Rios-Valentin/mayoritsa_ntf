@@ -12,9 +12,12 @@ export default {
       type: 'string',
       validation: (Rule) => Rule.required(),
     },
+    { name: 'codCliente', title: 'Cód. Cliente (sistema)', type: 'string', readOnly: true },
+    { name: 'cuit', title: 'CUIT', type: 'string' },
     { name: 'localidad', title: 'Localidad', type: 'string' },
     { name: 'provincia', title: 'Provincia', type: 'string' },
     { name: 'direccion', title: 'Dirección', type: 'string' },
+    { name: 'transporte', title: 'Transporte', type: 'string' },
     { name: 'telefono', title: 'Teléfono', type: 'string' },
     { name: 'email', title: 'Email', type: 'string' },
     {

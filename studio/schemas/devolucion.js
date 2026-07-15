@@ -1,10 +1,9 @@
-// Documento `pedido` (dataset interno). Los items son SNAPSHOT al momento del
-// pedido (precio/categoría congelados) para que las métricas históricas no
-// cambien si se edita el catálogo.
-
+// Documento `devolucion` (dataset interno): notas de crédito (NCA) importadas
+// del sistema. Cantidades en POSITIVO (unidades devueltas). Alimenta la stat
+// "artículos más devueltos" y el neto de ventas.
 export default {
-  name: 'pedido',
-  title: 'Pedido',
+  name: 'devolucion',
+  title: 'Devolución',
   type: 'document',
   fields: [
     {
@@ -14,22 +13,16 @@ export default {
       to: [{ type: 'cliente' }],
       validation: (Rule) => Rule.required(),
     },
-    {
-      name: 'fecha',
-      title: 'Fecha',
-      type: 'date',
-      initialValue: () => new Date().toISOString().slice(0, 10),
-      validation: (Rule) => Rule.required(),
-    },
+    { name: 'fecha', title: 'Fecha', type: 'date', validation: (Rule) => Rule.required() },
+    { name: 'nroComprobante', title: 'Nº comprobante', type: 'string' },
     {
       name: 'items',
-      title: 'Artículos',
+      title: 'Artículos devueltos',
       type: 'array',
       of: [
         {
           type: 'object',
           name: 'item',
-          title: 'Artículo',
           fields: [
             { name: 'sku', title: 'SKU', type: 'string' },
             { name: 'descripcion', title: 'Descripción', type: 'string' },
@@ -58,10 +51,10 @@ export default {
             { name: 'subtotal', title: 'Subtotal ($)', type: 'number' },
           ],
           preview: {
-            select: { sku: 'sku', descripcion: 'descripcion', unidades: 'unidades', subtotal: 'subtotal' },
-            prepare: ({ sku, descripcion, unidades, subtotal }) => ({
+            select: { sku: 'sku', descripcion: 'descripcion', unidades: 'unidades' },
+            prepare: ({ sku, descripcion, unidades }) => ({
               title: `${sku} — ${descripcion || ''}`,
-              subtitle: `${unidades ?? 0} u. · $ ${(subtotal ?? 0).toLocaleString('es-AR')}`,
+              subtitle: `${unidades ?? 0} u. devueltas`,
             }),
           },
         },
@@ -69,35 +62,16 @@ export default {
     },
     { name: 'totalUnidades', title: 'Total unidades', type: 'number' },
     { name: 'totalMonto', title: 'Total ($)', type: 'number' },
-    { name: 'tipoComprobante', title: 'Tipo comprobante', type: 'string', description: 'FA/FB si vino de la facturación importada.' },
-    { name: 'nroComprobante', title: 'Nº comprobante', type: 'string' },
-    {
-      name: 'archivo',
-      title: 'Archivo Excel',
-      type: 'file',
-      description: 'El .xlsx del pedido (generado o importado del historial).',
-    },
-    {
-      name: 'hojaOrigen',
-      title: 'Hoja de origen',
-      type: 'string',
-      description: 'Solo para pedidos importados del historial (libro/hoja de donde salió).',
-    },
-    { name: 'notas', title: 'Notas', type: 'text', rows: 2 },
   ],
   orderings: [
-    {
-      title: 'Fecha (recientes primero)',
-      name: 'fechaDesc',
-      by: [{ field: 'fecha', direction: 'desc' }],
-    },
+    { title: 'Fecha (recientes primero)', name: 'fechaDesc', by: [{ field: 'fecha', direction: 'desc' }] },
   ],
   preview: {
     select: { nombre: 'cliente.nombre', fecha: 'fecha', total: 'totalMonto', unidades: 'totalUnidades' },
     prepare({ nombre, fecha, total, unidades }) {
       const f = fecha ? fecha.split('-').reverse().join('/') : 'sin fecha';
       return {
-        title: `${nombre || 'Sin cliente'} — ${f}`,
+        title: `↩ ${nombre || 'Sin cliente'} — ${f}`,
         subtitle: `${unidades ?? 0} u. · $ ${(total ?? 0).toLocaleString('es-AR')}`,
       };
     },

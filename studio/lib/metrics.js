@@ -30,6 +30,11 @@ export function topArticulos(pedidos, n = 10) {
   return [...map.values()].sort((a, b) => b.unidades - a.unidades).slice(0, n);
 }
 
+// Artículos más devueltos (misma forma de items que los pedidos).
+export function topDevueltos(devoluciones, n = 10) {
+  return topArticulos(devoluciones, n);
+}
+
 export function ventasPorCategoria(pedidos) {
   const map = new Map();
   for (const p of pedidos) {

@@ -1,12 +1,14 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { UploadIcon, ImagesIcon, TagIcon, UsersIcon, BasketIcon, ArchiveIcon, BarChartIcon } from '@sanity/icons';
+import { UploadIcon, ImagesIcon, TagIcon, UsersIcon, BasketIcon, ArchiveIcon, BarChartIcon, DocumentsIcon } from '@sanity/icons';
 import { catalogoTypes, internoTypes } from './schemas/index.js';
 import BulkImport from './tools/BulkImport.jsx';
 import BulkPhotos from './tools/BulkPhotos.jsx';
 import ArmarPedido from './tools/ArmarPedido.jsx';
 import ImportHistorial from './tools/ImportHistorial.jsx';
+import ImportFacturacion from './tools/ImportFacturacion.jsx';
 import Dashboard from './tools/dashboard/Dashboard.jsx';
+import { descargarHistorialAction } from './actions/descargarHistorial.js';
 
 const projectId = '1uuj4tpg';
 
@@ -32,6 +34,7 @@ const internoStructure = (S) =>
             )
         ),
       S.documentTypeListItem('pedido').title('Todos los pedidos'),
+      S.documentTypeListItem('devolucion').title('Devoluciones'),
     ]);
 
 export default defineConfig([
@@ -90,12 +93,23 @@ export default defineConfig([
         component: Dashboard,
       },
       {
+        name: 'importar-facturacion',
+        title: 'Importar facturación',
+        icon: DocumentsIcon,
+        component: ImportFacturacion,
+      },
+      {
         name: 'importar-historial',
         title: 'Importar historial',
         icon: ArchiveIcon,
         component: ImportHistorial,
       },
     ],
+
+    document: {
+      actions: (prev, context) =>
+        context.schemaType === 'cliente' ? [...prev, descargarHistorialAction] : prev,
+    },
 
     schema: {
       types: internoTypes,

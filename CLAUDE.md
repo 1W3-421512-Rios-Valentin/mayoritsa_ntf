@@ -115,17 +115,27 @@ Dataset `interno` (`aclMode: private`, mismo proyecto Sanity): pedidos y
 clientes. Solo lectura/escritura autenticada (Studio). El front público NO
 accede a estos datos.
 
-- **`cliente`**: nombre (req), localidad, provincia, direccion, telefono,
-  email, `ubicacion` (geopoint, input custom Leaflet), notas, activo.
+- **`cliente`**: nombre (req), `codCliente` (ID del sistema, readOnly), cuit,
+  localidad, provincia, direccion, transporte, telefono, email, `ubicacion`
+  (geopoint, input custom Leaflet), notas, activo.
 - **`pedido`**: `cliente` (reference), `fecha` (date), `items[]` (SNAPSHOT:
   sku, descripcion, categoria, precio, cantidades[{talle, cantidad}],
-  unidades, subtotal), `totalUnidades`, `totalMonto`, `archivo` (file .xlsx),
-  `hojaOrigen` (para importados del historial), notas.
+  unidades, subtotal), `totalUnidades`, `totalMonto`, `tipoComprobante` (FA/FB),
+  `nroComprobante`, `archivo` (file .xlsx), `hojaOrigen`, notas.
+- **`devolucion`**: notas de crédito (NCA) importadas. Igual shape que `pedido`
+  (items con cantidades en positivo) + `nroComprobante`. Alimenta la stat
+  "artículos más devueltos" y el neto.
 - El Studio tiene **dos workspaces**: "Catálogo" (production) e "Interno"
-  (interno), con structure "Pedidos por cliente" (carpeta por cliente).
+  (interno), con structure "Pedidos por cliente" + "Devoluciones".
 - Tools del workspace Interno: **Armar pedido** (guarda + exporta Excel),
-  **Dashboard** (Resumen/Alertas/Mapa) e **Importar historial** (carpetas
-  ex-SharePoint: cada hoja de cada .xlsx = un pedido).
+  **Dashboard** (Resumen/Alertas/Mapa + artículos más devueltos), **Importar
+  facturación** (CSV del sistema → clientes/pedidos/devoluciones, dedupe por
+  ids determinísticos `pedido.{cod}.{tipo}.{fecha}`) e **Importar historial**
+  (carpetas ex-SharePoint: cada hoja de cada .xlsx = un pedido).
+- Document action en `cliente`: **Descargar historial Excel** (un libro con una
+  hoja por pedido).
+- **Nota del CSV de facturación:** el `N.Comp.` viene casi siempre corrupto a
+  `2,222E+11` (Excel) → los comprobantes se agrupan por cliente+tipo+fecha.
 
 ## 7. Vistas
 

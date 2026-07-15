@@ -1,10 +1,10 @@
 // Pestaña Resumen: KPIs + rankings + serie temporal, con filtros fecha/cliente.
 import React, { useState, useMemo } from 'react';
 import { Stack, Flex, Box, Text, TextInput, Select, Card } from '@sanity/ui';
-import { filtrar, topArticulos, ventasPorCategoria, topClientes, pedidosPorPeriodo, actividadClientes, fmtARS } from '../../lib/metrics.js';
+import { filtrar, topArticulos, topDevueltos, ventasPorCategoria, topClientes, pedidosPorPeriodo, actividadClientes, fmtARS } from '../../lib/metrics.js';
 import { Kpi, BarrasH, BarrasV } from './charts.jsx';
 
-export default function Resumen({ pedidos, clientes }) {
+export default function Resumen({ pedidos, clientes, devoluciones = [] }) {
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
   const [clienteId, setClienteId] = useState('');
@@ -19,7 +19,14 @@ export default function Resumen({ pedidos, clientes }) {
   const totalU = filtrados.reduce((n, p) => n + (p.totalUnidades || 0), 0);
   const clientesActivos = new Set(filtrados.map((p) => p.cliente?._id).filter(Boolean)).size;
 
+  const devFiltradas = useMemo(
+    () => filtrar(devoluciones, { desde: desde || undefined, hasta: hasta || undefined, clienteId: clienteId || undefined }),
+    [devoluciones, desde, hasta, clienteId]
+  );
+  const unidadesDevueltas = devFiltradas.reduce((n, d) => n + (d.totalUnidades || 0), 0);
+
   const arts = topArticulos(filtrados, 10);
+  const devs = topDevueltos(devFiltradas, 10);
   const cats = ventasPorCategoria(filtrados);
   const tops = topClientes(filtrados, 10);
   const serie = pedidosPorPeriodo(filtrados, periodo);
@@ -55,6 +62,7 @@ export default function Resumen({ pedidos, clientes }) {
         <Kpi label="Unidades" value={totalU.toLocaleString('es-AR')} />
         <Kpi label="Facturación" value={fmtARS(totalM)} />
         <Kpi label="Clientes con pedidos" value={clientesActivos} />
+        <Kpi label="Unidades devueltas" value={unidadesDevueltas.toLocaleString('es-AR')} sub={fmtARS(devFiltradas.reduce((n, d) => n + (d.totalMonto || 0), 0))} />
       </Flex>
 
       {/* Pedidos por período */}
@@ -116,6 +124,16 @@ export default function Resumen({ pedidos, clientes }) {
           />
         </Box>
       </Flex>
+
+      <BarrasH
+        titulo="Artículos más devueltos (unidades)"
+        color="#e05a6b"
+        rows={devs.map((d) => ({
+          label: `${d.sku} — ${d.descripcion}`,
+          value: d.unidades,
+          texto: `${d.unidades} u. · ${fmtARS(d.monto)}`,
+        }))}
+      />
     </Stack>
   );
 }
