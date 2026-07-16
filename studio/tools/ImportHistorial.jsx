@@ -261,14 +261,14 @@ export default function ImportHistorial() {
                                   disabled={dup}
                                   onChange={(e) => setEdit(p.key, { selected: e.currentTarget.checked })}
                                 />
-                                <Box style={{ flex: 1, minWidth: 200 }}>
+                                <Stack space={2} style={{ flex: 1, minWidth: 200 }}>
                                   <Text size={1}>{p.archivo} — hoja «{p.hoja}»</Text>
                                   <Text size={0} muted>
                                     {p.items.length} artículo(s) · {p.totalUnidades} u. · {fmtARS(p.totalMonto)}
                                     {dup ? ' · ya importado' : ''}
                                     {p.skusDesconocidos.length ? ` · ${p.skusDesconocidos.length} SKU fuera del catálogo` : ''}
                                   </Text>
-                                </Box>
+                                </Stack>
                                 <Box style={{ width: 160 }}>
                                   <TextInput
                                     type="date"

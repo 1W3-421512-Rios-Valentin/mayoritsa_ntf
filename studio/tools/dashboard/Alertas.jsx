@@ -58,13 +58,13 @@ export default function Alertas({ pedidos, clientes }) {
             {filas.map((f) => (
               <Card key={f.clienteId} padding={2} radius={2} tone="default" border>
                 <Flex align="center" gap={3} wrap="wrap">
-                  <Box style={{ flex: 1, minWidth: 180 }}>
+                  <Stack space={2} style={{ flex: 1, minWidth: 180 }}>
                     <Text size={1} weight="semibold">{f.nombre}</Text>
                     <Text size={0} muted>
                       {f.pedidos} pedido(s) · último: {ddmm(f.ultimo)}
                       {f.gapPromedio != null ? ` · pide cada ~${f.gapPromedio} días` : ''}
                     </Text>
-                  </Box>
+                  </Stack>
                   {f.caidaRitmo && <Badge tone="caution">ritmo ↓</Badge>}
                   <Badge tone={f.bucket.tone} fontSize={1} padding={2}>
                     {f.diasInactivo != null ? `${f.diasInactivo} días · ` : ''}{f.bucket.label}

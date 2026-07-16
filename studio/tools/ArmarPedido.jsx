@@ -251,10 +251,10 @@ export default function ArmarPedido() {
                           {p.fotoUrl
                             ? <img src={`${p.fotoUrl}?w=64&h=64&fit=crop&auto=format`} alt="" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
                             : <Box style={{ width: 48, height: 48, borderRadius: 6, background: 'var(--card-border-color)' }} />}
-                          <Box style={{ minWidth: 180, flex: 1 }}>
+                          <Stack space={2} style={{ minWidth: 180, flex: 1 }}>
                             <Text size={1} weight="semibold" textOverflow="ellipsis">{p.descripcion}</Text>
                             <Text size={0} muted>{p.sku} · {p.categoria || 's/cat'} · {fmtARS(p.precio)}</Text>
-                          </Box>
+                          </Stack>
                           <Flex gap={2} wrap="wrap">
                             {talles.map((t) => (
                               <Stack key={t} space={1} style={{ alignItems: 'center' }}>
@@ -270,10 +270,10 @@ export default function ArmarPedido() {
                               </Stack>
                             ))}
                           </Flex>
-                          <Box style={{ width: 110, textAlign: 'right' }}>
+                          <Stack space={2} style={{ width: 110, textAlign: 'right' }}>
                             <Text size={1} weight="semibold">{unidades > 0 ? fmtARS(sub) : '—'}</Text>
                             <Text size={0} muted>{unidades} u.</Text>
-                          </Box>
+                          </Stack>
                         </Flex>
                       </Card>
                     );

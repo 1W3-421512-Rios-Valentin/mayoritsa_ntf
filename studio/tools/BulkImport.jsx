@@ -218,14 +218,14 @@ export default function BulkImport() {
                           disabled={yaExiste}
                           onChange={(e) => setEdit(a.codigo, { selected: e.currentTarget.checked })}
                         />
-                        <div style={{ minWidth: 0 }}>
+                        <Stack space={2} style={{ minWidth: 0 }}>
                           <Text size={1} weight="semibold" textOverflow="ellipsis" title={a.descripcion}>
                             {a.descripcion}
                           </Text>
                           <Text size={0} muted textOverflow="ellipsis">
                             {a.codigo} · {a.rubro}{yaExiste ? ' · ya existe' : ''}
                           </Text>
-                        </div>
+                        </Stack>
                         <Select
                           value={s.tipoTalle || a.tipoTalle}
                           disabled={yaExiste}

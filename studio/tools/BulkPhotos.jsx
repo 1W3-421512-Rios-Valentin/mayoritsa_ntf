@@ -192,10 +192,10 @@ export default function BulkPhotos() {
                       <Card key={sku} padding={2} radius={2} tone="default">
                         <Flex align="center" gap={3}>
                           <Thumb file={arr[0].file} />
-                          <Box style={{ flex: 1, minWidth: 0 }}>
+                          <Stack space={2} style={{ flex: 1, minWidth: 0 }}>
                             <Text size={1} weight="semibold" textOverflow="ellipsis">{prod?.descripcion || '(sin descripción)'}</Text>
                             <Text size={0} muted>{sku} · {arr.length} foto(s){prev > 0 ? ` · reemplaza ${prev}` : ''}</Text>
-                          </Box>
+                          </Stack>
                         </Flex>
                       </Card>
                     );

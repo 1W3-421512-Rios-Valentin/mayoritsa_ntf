@@ -99,12 +99,12 @@ export default function ResetDatos() {
             {conteo == null ? (
               <Flex align="center" gap={2}><Spinner muted /><Text size={1} muted>Contando…</Text></Flex>
             ) : (
-              <Box>
+              <Stack space={2}>
                 <Text size={1}>Se van a borrar:</Text>
                 <Text size={2} weight="bold">
                   {conteo.clientes} clientes · {conteo.pedidos} pedidos · {conteo.devoluciones} devoluciones
                 </Text>
-              </Box>
+              </Stack>
             )}
 
             {!vacio && (
