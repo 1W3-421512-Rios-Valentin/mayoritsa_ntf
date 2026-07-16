@@ -1,12 +1,13 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { UploadIcon, ImagesIcon, TagIcon, UsersIcon, BasketIcon, ArchiveIcon, BarChartIcon, DocumentsIcon, TrashIcon } from '@sanity/icons';
+import { UploadIcon, ImagesIcon, TagIcon, UsersIcon, BasketIcon, ArchiveIcon, BarChartIcon, DocumentsIcon, TrashIcon, ComponentIcon } from '@sanity/icons';
 import { catalogoTypes, internoTypes } from './schemas/index.js';
 import BulkImport from './tools/BulkImport.jsx';
 import BulkPhotos from './tools/BulkPhotos.jsx';
 import ArmarPedido from './tools/ArmarPedido.jsx';
 import ImportHistorial from './tools/ImportHistorial.jsx';
 import ImportFacturacion from './tools/ImportFacturacion.jsx';
+import AsignarTelas from './tools/AsignarTelas.jsx';
 import ResetDatos from './tools/ResetDatos.jsx';
 import Dashboard from './tools/dashboard/Dashboard.jsx';
 import { descargarHistorialAction } from './actions/descargarHistorial.js';
@@ -36,6 +37,19 @@ const internoStructure = (S) =>
         ),
       S.documentTypeListItem('pedido').title('Todos los pedidos'),
       S.documentTypeListItem('devolucion').title('Devoluciones'),
+      S.divider(),
+      S.listItem()
+        .title('Producción')
+        .id('produccion')
+        .icon(ComponentIcon)
+        .child(
+          S.list()
+            .title('Producción')
+            .items([
+              S.documentTypeListItem('tela').title('Telas'),
+              S.documentTypeListItem('proveedor').title('Proveedores'),
+            ])
+        ),
     ]);
 
 export default defineConfig([
@@ -71,7 +85,7 @@ export default defineConfig([
   },
   {
     name: 'interno',
-    title: 'Interno (pedidos)',
+    title: 'Interno',
     icon: UsersIcon,
     basePath: '/interno',
     projectId,
@@ -92,6 +106,12 @@ export default defineConfig([
         title: 'Dashboard',
         icon: BarChartIcon,
         component: Dashboard,
+      },
+      {
+        name: 'asignar-telas',
+        title: 'Asignar telas',
+        icon: ComponentIcon,
+        component: AsignarTelas,
       },
       {
         name: 'importar-facturacion',

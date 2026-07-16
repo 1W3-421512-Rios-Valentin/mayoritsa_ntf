@@ -125,13 +125,30 @@ accede a estos datos.
 - **`devolucion`**: notas de crédito (NCA) importadas. Igual shape que `pedido`
   (items con cantidades en positivo) + `nroComprobante`. Alimenta la stat
   "artículos más devueltos" y el neto.
+- **`tela`** (Producción): `codigoTela` (req), nombre, composicion, estructura,
+  gramaje (g/m²), `rendimiento` (**metros por prenda**), anchoRollo (cm),
+  largoRollo (m), propiedades (texto), `proveedor` (reference), precioRollo,
+  `productos[]` = `{sku, descripcion, consumo?}` (los SKUs que la usan; `consumo`
+  pisa al `rendimiento`). **Vínculo por SKU**, no por reference: los `producto`
+  viven en `production` y Sanity no soporta referencias cross-dataset.
+  Una tela → muchos productos; un producto puede tener varias telas.
+- **`proveedor`**: nombre (req), contacto, telefono, email, notas, activo.
+  > Tela/proveedor van en `interno` porque incluyen **precio de rollo y
+  > proveedor** (datos sensibles que no pueden ir al dataset público).
 - El Studio tiene **dos workspaces**: "Catálogo" (production) e "Interno"
-  (interno), con structure "Pedidos por cliente" + "Devoluciones".
+  (interno), con structure "Pedidos por cliente" + "Devoluciones" + sección
+  **Producción** (Telas / Proveedores).
 - Tools del workspace Interno: **Armar pedido** (guarda + exporta Excel),
-  **Dashboard** (Resumen/Alertas/Mapa + artículos más devueltos), **Importar
+  **Dashboard** (Resumen/Productos/Alertas/Mapa + artículos más devueltos),
+  **Asignar telas** (masivo selectivo: tela → muchos SKUs), **Importar
   facturación** (CSV del sistema → clientes/pedidos/devoluciones, dedupe por
-  ids determinísticos `pedido.{cod}.{tipo}.{fecha}`) e **Importar historial**
-  (carpetas ex-SharePoint: cada hoja de cada .xlsx = un pedido).
+  ids determinísticos `pedido.{cod}.{tipo}.{fecha}`), **Importar historial**
+  (carpetas ex-SharePoint: cada hoja de cada .xlsx = un pedido) y **Resetear
+  datos**.
+- **Futuro habilitado** (no implementado): compra de tela =
+  `Σ (unidades vendidas del SKU × (consumo || rendimiento))` → rollos =
+  metros / `largoRollo`; costo = rollos × `precioRollo`. Telas y pedidos están
+  en el mismo dataset, así que sale con una sola GROQ.
 - Document action en `cliente`: **Descargar historial Excel** (un libro con una
   hoja por pedido).
 - **Nota del CSV de facturación:** el `N.Comp.` viene casi siempre corrupto a
